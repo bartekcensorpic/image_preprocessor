@@ -8,7 +8,6 @@ def init(args):
     process_all_images(input_path= input_path, output_path=output_path, resized_image_shape=resized_image_shape)
 
 
-
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Preprocessing the images')
 
@@ -21,7 +20,7 @@ if __name__ == '__main__':
     parser.add_argument(
         "--input_path",
         type=str,
-        help="Path to root folder with the folders of categories. Categories will be named after folder pictures are in."
+        help="Path to root folder with the folders of categories."
     )
 
     parser.add_argument(
