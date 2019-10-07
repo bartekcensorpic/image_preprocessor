@@ -23,11 +23,11 @@ def process_image(
         str_id = str(current_id).zfill(zero_fill_id)
         current_id += 1
 
-        image_new_name = f"img_{current_category_name}_{str_id}"
+        image_new_name = f"img_{current_category_name}_{str_id}.jpg"
         binarized_label = binarizer.transform([current_category_name])
 
         df.loc[len(df)] = [image_new_name, binarized_label.flatten(), current_category_name]
-        new_image_path = os.path.join(output_image_folder_path, f"{image_new_name}.jpg")
+        new_image_path = os.path.join(output_image_folder_path, image_new_name)
         img = Image.open(image_path).resize(resized_image_shape)
 
         # todo normalize picture here
