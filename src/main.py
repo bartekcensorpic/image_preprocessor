@@ -27,14 +27,14 @@ if __name__ == '__main__':
         "--resize_image_width",
         type=int,
         help="Width of resized images in pixels (int)",
-        default=320,
+        default=640,
     )
 
     parser.add_argument(
         "--resize_image_height",
         type=int,
         help="Height of resized images in pixels (int)",
-        default=160,
+        default=640,
 
     )
 
