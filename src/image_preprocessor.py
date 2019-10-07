@@ -4,13 +4,15 @@ import os
 from utils import *
 import pandas as pd
 from typing import List, Tuple
-from sklearn.preprocessing import LabelBinarizer
+from sklearn.preprocessing import LabelEncoder
+import pickle
+
 
 
 def process_image(
     df: pd.DataFrame,
     current_id: int,
-    binarizer: LabelBinarizer,
+    encoder: LabelEncoder,
     current_category_name: str,
     images_in_category: List,
     output_image_folder_path: str,
@@ -24,9 +26,9 @@ def process_image(
         current_id += 1
 
         image_new_name = f"img_{current_category_name}_{str_id}.jpg"
-        binarized_label = binarizer.transform([current_category_name])
+        binarized_label = encoder.transform([current_category_name])
 
-        df.loc[len(df)] = [image_new_name, binarized_label.flatten(), current_category_name]
+        df.loc[len(df)] = [image_new_name, int(binarized_label), current_category_name]
         new_image_path = os.path.join(output_image_folder_path, image_new_name)
         img = Image.open(image_path).resize(resized_image_shape)
 
@@ -55,15 +57,18 @@ def process_all_images(input_path: str, output_path: str, resized_image_shape: T
     current_id = 1
     categories_names = list(os.listdir(input_path))
 
-    binarizer = LabelBinarizer()
-    binarizer.fit(categories_names)
+    encoder = LabelEncoder()
+    encoder.fit(categories_names)
+
+    pickle_output = open('classes_encoder.pkl', 'wb')
+    pickle.dump(encoder, pickle_output)
 
     for folder_name in os.listdir(input_path):
         current_category_name = folder_name
         category_path = os.path.join(input_path, folder_name)
         images_in_category = list(Path(category_path).glob("*.jpg"))
         df, current_id = process_image(
-            df, current_id, binarizer, current_category_name, images_in_category,output_images_path, resized_image_shape
+            df, current_id, encoder, current_category_name, images_in_category,output_images_path, resized_image_shape
         )
 
         df.to_csv(csv_file_path, index=False)
