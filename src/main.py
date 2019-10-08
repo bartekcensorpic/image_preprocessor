@@ -8,7 +8,7 @@ def init(args):
     process_all_images(input_path= input_path, output_path=output_path, resized_image_shape=resized_image_shape)
 
 
-if __name__ == '__main__':
+def main():
     parser = argparse.ArgumentParser(description='Preprocessing the images')
 
     parser.add_argument(
@@ -42,3 +42,5 @@ if __name__ == '__main__':
     print(print(args))
     init(args)
 
+if __name__ == '__main__':
+    main()
