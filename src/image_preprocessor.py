@@ -18,6 +18,8 @@ def process_image(
     resized_image_shape:Tuple,
     zero_fill_id=16,
 ):
+
+    #todo save original picture name with folder it is in, so we can upload only new images and skip the ones that already are on the bucket
     for image in images_in_category:
         image_path = str(image)
 
