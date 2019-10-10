@@ -6,6 +6,7 @@ import pandas as pd
 from typing import List, Tuple
 from sklearn.preprocessing import LabelBinarizer
 import pickle
+import numpy as np
 
 
 def process_image(
@@ -29,7 +30,8 @@ def process_image(
         image_new_name = f"img_{current_category_name}_{str_id}.jpg"
         binarized_label = encoder.transform([current_category_name])
 
-        df.loc[len(df)] = [image_new_name, (binarized_label.flatten()), current_category_name]
+        #save image file name, its category in 1hot encoding and its category name
+        df.loc[len(df)] = [image_new_name, binarized_label.flatten().tolist(), current_category_name]
         new_image_path = os.path.join(output_image_folder_path, image_new_name)
         img = Image.open(image_path).resize(resized_image_shape)
 
@@ -60,7 +62,7 @@ def process_all_images(input_path: str, output_path: str, resized_image_shape: T
 
     encoder = LabelBinarizer()
     encoder.fit(categories_names)
-
+    #save encoder to file so we can use it in algorithm
     pickle_output = open(os.path.join(output_path,'classes_encoder.pkl'), 'wb')
     pickle.dump(encoder, pickle_output)
 
@@ -72,6 +74,6 @@ def process_all_images(input_path: str, output_path: str, resized_image_shape: T
             df, current_id, encoder, current_category_name, images_in_category,output_images_path, resized_image_shape
         )
 
-        df.to_csv(csv_file_path, index=False)
+        df.to_csv(csv_file_path, index=False, quotechar='"', encoding='ascii')
 
     print("done, processed", len(df), "images")
