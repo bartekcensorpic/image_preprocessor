@@ -27,7 +27,8 @@ def prepare_csv(csv_file_path:str):
     image_id = 'image_name'
     category_id = 'category_id'
     category_name = 'category_name'
-    columns = [image_id, category_id, category_name]
+    original_name = 'orignal_file_name'
+    columns = [image_id, category_id, category_name,original_name]
 
     with open(csv_file_path,'w+') as write_file:
         writer = csv.writer(write_file)

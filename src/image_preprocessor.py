@@ -22,6 +22,8 @@ def process_image(
 
     #todo save original picture name with folder it is in, so we can upload only new images and skip the ones that already are on the bucket
     for image in images_in_category:
+
+        orignal_name  = os.path.join(current_category_name,os.path.split(image)[1])
         image_path = str(image)
 
         str_id = str(current_id).zfill(zero_fill_id)
@@ -31,7 +33,7 @@ def process_image(
         binarized_label = encoder.transform([current_category_name])
 
         #save image file name, its category in 1hot encoding and its category name
-        df.loc[len(df)] = [image_new_name, binarized_label.flatten().tolist(), current_category_name]
+        df.loc[len(df)] = [image_new_name, binarized_label.flatten().tolist(), current_category_name, orignal_name]
         new_image_path = os.path.join(output_image_folder_path, image_new_name)
         img = Image.open(image_path).resize(resized_image_shape)
 
@@ -57,7 +59,7 @@ def process_all_images(input_path: str, output_path: str, resized_image_shape: T
     prepare_csv(csv_file_path)
 
     df = pd.read_csv(csv_file_path)
-    current_id = 1
+    current_id = 1 #has to check the current id in the folder or be set to 1 if none
     categories_names = list(os.listdir(input_path))
 
     encoder = LabelBinarizer()
