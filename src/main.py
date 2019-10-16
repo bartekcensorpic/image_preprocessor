@@ -9,32 +9,33 @@ def init(args):
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Preprocessing the images')
+    parser = argparse.ArgumentParser(description='Preprocessing the images. Reads images from category folders,'
+                                                 ' saves them to one folder and creates CSV file that describes each file.')
 
     parser.add_argument(
         "--output_path",
         type=str,
-        help="Path to place where you want your output."
+        help="Path to place where you want your output. If not empty you will be asked to delete it."
     )
 
     parser.add_argument(
         "--input_path",
         type=str,
-        help="Path to root folder with the folders of categories."
+        help="Path to root folder with the folders of categories. Categories in CSV will be named after folders names"
     )
 
     parser.add_argument(
         "--resize_image_width",
         type=int,
         help="Width of resized images in pixels (int)",
-        default=640,
+        default=224,
     )
 
     parser.add_argument(
         "--resize_image_height",
         type=int,
         help="Height of resized images in pixels (int)",
-        default=640,
+        default=224,
 
     )
 
