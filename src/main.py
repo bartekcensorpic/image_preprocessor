@@ -1,11 +1,19 @@
-from image_preprocessor import process_all_images
+from src.image_preprocessor import process_all_images
 import argparse
+from src.transformations import TransformationsEnum
 
 def init(args):
     output_path = args.output_path
     input_path = args.input_path
     resized_image_shape = (args.resize_image_width, args.resize_image_height)
-    process_all_images(input_path= input_path, output_path=output_path, resized_image_shape=resized_image_shape)
+
+    transformations = []
+    if args.to_hog == True:
+        transformations.append(TransformationsEnum('hog'))
+    if args.to_greyscale == True:
+        transformations.append(TransformationsEnum('greyscale'))
+
+    process_all_images(input_path= input_path, output_path=output_path, resized_image_shape=resized_image_shape,transformations = transformations)
 
 
 def main():
@@ -37,6 +45,20 @@ def main():
         help="Height of resized images in pixels (int)",
         default=224,
 
+    )
+
+    parser.add_argument(
+        "--to_greyscale",
+        type=bool,
+        help="Converts images to greyscale (and to PNG)",
+        default=False,
+    )
+
+    parser.add_argument(
+        "--to_hog",
+        type=bool,
+        help="Converts images to Histogram of oriented gradients (and to PNG)",
+        default=False,
     )
 
     args = parser.parse_args()

@@ -7,6 +7,7 @@ from typing import List, Tuple
 from sklearn.preprocessing import LabelBinarizer
 import pickle
 import numpy as np
+from src.transformations import TransformationsEnum, to_grey_scale, to_hog
 
 
 def process_image(
@@ -17,11 +18,13 @@ def process_image(
     images_in_category: List,
     output_image_folder_path: str,
     resized_image_shape:Tuple,
+    transformations:List[TransformationsEnum],
     zero_fill_id=16,
 ):
     """
     Saves current folder images (as a category) to a new folder, with changed name and its data saved to a dataframe
 
+    :param transformations: List of transformations
     :param df: previous dataframe
     :param current_id: current file index
     :param encoder: encoder used to categorise picture label
@@ -42,7 +45,7 @@ def process_image(
         str_id = str(current_id).zfill(zero_fill_id)
         current_id += 1
 
-        image_new_name = f"img_{current_category_name}_{str_id}.jpg"
+        image_new_name = f"img_{current_category_name}_{str_id}.png"
         binarized_label = encoder.transform([current_category_name])
 
         #save image file name, its category in 1hot encoding and its category name
@@ -50,13 +53,19 @@ def process_image(
         new_image_path = os.path.join(output_image_folder_path, image_new_name)
         img = Image.open(image_path).resize(resized_image_shape)
 
-        # todo normalize picture here if you want.
-        # todo Keras training model (for 16/10/2019) normalizes (divides by 255) and applies trasformation to the images.
+        #apply transformations
+        if TransformationsEnum('hog') in transformations:
+            img = to_hog(img)
+
+        if TransformationsEnum('greyscale') in transformations:
+            img = to_grey_scale(img)
+
+
 
         try:
             img.save(new_image_path)
         except OSError:
-            img.convert('RGB').save(new_image_path)
+            img.convert('RGB').save(new_image_path, "PNG")
 
     #reutrning current_id instead
     print(f"Processed category {current_category_name}, {len(df)} in total")
@@ -64,7 +73,7 @@ def process_image(
 
 
 
-def process_all_images(input_path: str, output_path: str, resized_image_shape: Tuple):
+def process_all_images(input_path: str, output_path: str, resized_image_shape: Tuple,transformations:List[TransformationsEnum]):
     """
     Reads the folders, names categories with their names and returns CSV file with metadata
 
@@ -97,7 +106,7 @@ def process_all_images(input_path: str, output_path: str, resized_image_shape: T
         category_path = os.path.join(input_path, folder_name)
         images_in_category = list(Path(category_path).glob("*.jpg"))
         df, current_id = process_image(
-            df, current_id, encoder, current_category_name, images_in_category,output_images_path, resized_image_shape
+            df, current_id, encoder, current_category_name, images_in_category,output_images_path, resized_image_shape,transformations
         )
 
         df.to_csv(csv_file_path, index=False, quotechar='"', encoding='ascii')
