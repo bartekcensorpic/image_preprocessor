@@ -35,4 +35,4 @@ def to_hog(image:Image.Image)-> Image.Image:
 
     image_back = Image.fromarray(hog_image)
 
-    return image_back
+    return image_back.convert('L')

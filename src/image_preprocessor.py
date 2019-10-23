@@ -51,7 +51,7 @@ def process_image(
         #save image file name, its category in 1hot encoding and its category name
         df.loc[len(df)] = [image_new_name, binarized_label.flatten().tolist(), current_category_name, orignal_name]
         new_image_path = os.path.join(output_image_folder_path, image_new_name)
-        img = Image.open(image_path).resize(resized_image_shape)
+        img = Image.open(image_path).convert('RGB').resize(resized_image_shape)
 
         #apply transformations
         if TransformationsEnum('hog') in transformations:
@@ -60,10 +60,8 @@ def process_image(
         if TransformationsEnum('grayscale') in transformations:
             img = to_gray_scale(img)
 
-        try:
-            img.save(new_image_path)
-        except OSError:
-            img.convert('RGB').save(new_image_path, "PNG")
+        img.save(new_image_path)
+
 
     #reutrning current_id instead
     print(f"Processed category {current_category_name}, {len(df)} in total")
