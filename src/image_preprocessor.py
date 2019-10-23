@@ -7,7 +7,7 @@ from typing import List, Tuple
 from sklearn.preprocessing import LabelBinarizer
 import pickle
 import numpy as np
-from src.transformations import TransformationsEnum, to_grey_scale, to_hog
+from src.transformations import TransformationsEnum, to_gray_scale, to_hog
 
 
 def process_image(
@@ -57,10 +57,8 @@ def process_image(
         if TransformationsEnum('hog') in transformations:
             img = to_hog(img)
 
-        if TransformationsEnum('greyscale') in transformations:
-            img = to_grey_scale(img)
-
-
+        if TransformationsEnum('grayscale') in transformations:
+            img = to_gray_scale(img)
 
         try:
             img.save(new_image_path)

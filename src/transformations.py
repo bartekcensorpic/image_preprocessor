@@ -4,18 +4,18 @@ import numpy as np
 from enum import Enum
 
 class TransformationsEnum(Enum):
-    grey_scale = 'greyscale'
+    grey_scale = 'grayscale'
     hog = 'hog'
 
     def __str__(self):
         return self.value
 
-def to_grey_scale(image:Image.Image)-> Image.Image:
+def to_gray_scale(image:Image.Image)-> Image.Image:
     """
-    Transform image to greyscale
+    Transform image to grayscale
 
     :param image: image to be transformed (Pillow image)
-    :return: greyscale image (Pillow image)
+    :return: grayscale image (Pillow image)
     """
 
     return image.convert('L')

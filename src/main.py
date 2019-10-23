@@ -10,8 +10,8 @@ def init(args):
     transformations = []
     if args.to_hog == True:
         transformations.append(TransformationsEnum('hog'))
-    if args.to_greyscale == True:
-        transformations.append(TransformationsEnum('greyscale'))
+    if args.to_grayscale == True:
+        transformations.append(TransformationsEnum('grayscale'))
 
     process_all_images(input_path= input_path, output_path=output_path, resized_image_shape=resized_image_shape,transformations = transformations)
 
@@ -48,9 +48,9 @@ def main():
     )
 
     parser.add_argument(
-        "--to_greyscale",
+        "--to_grayscale",
         type=bool,
-        help="Converts images to greyscale (and to PNG)",
+        help="Converts images to grayscale (and to PNG)",
         default=False,
     )
 
