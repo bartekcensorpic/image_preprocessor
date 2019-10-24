@@ -1,5 +1,6 @@
 from PIL import Image
 from skimage.feature import hog
+from skimage import exposure
 import numpy as np
 from enum import Enum
 
@@ -21,18 +22,18 @@ def to_gray_scale(image:Image.Image)-> Image.Image:
     return image.convert('L')
 
 
-def to_hog(image:Image.Image)-> Image.Image:
+def to_hog(image:Image.Image)-> np.ndarray:
     """
     transforms image using histogram of oriented gradients
 
     :param image: image to be transformed (Pillow image)
-    :return: image (Pillow image)
+    :return: np.array
     """
 
     pixels = np.array(image)
-    fd, hog_image = hog(image, orientations=8, pixels_per_cell=(16, 16),
+    fd, hog_image = hog(image, orientations=8, pixels_per_cell=(8, 8),
                         cells_per_block=(1, 1), visualize=True, multichannel=True)
 
-    image_back = Image.fromarray(hog_image)
+    hog_image_rescaled = exposure.rescale_intensity(hog_image, in_range=(0, 10))
 
-    return image_back.convert('L')
+    return hog_image_rescaled

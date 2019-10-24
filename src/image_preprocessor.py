@@ -5,6 +5,7 @@ from utils import *
 import pandas as pd
 from typing import List, Tuple
 from sklearn.preprocessing import LabelBinarizer
+import matplotlib.pyplot as plt
 import pickle
 import numpy as np
 from src.transformations import TransformationsEnum, to_gray_scale, to_hog
@@ -56,9 +57,13 @@ def process_image(
         #apply transformations
         if TransformationsEnum('hog') in transformations:
             img = to_hog(img)
+            # because something fucky happens when you try apply HOG and rescale its intensity and then try to save it using pillow :(
+            plt.imsave(new_image_path, img)
+            continue
 
         if TransformationsEnum('grayscale') in transformations:
             img = to_gray_scale(img)
+
 
         img.save(new_image_path)
 
