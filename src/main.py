@@ -1,4 +1,4 @@
-from image_preprocessor import process_all_images
+from src.image_preprocessor import process_all_images
 import argparse
 
 def init(args):

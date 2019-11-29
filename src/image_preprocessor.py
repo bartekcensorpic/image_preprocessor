@@ -1,7 +1,7 @@
 from PIL import Image
 from pathlib import Path
 import os
-from utils import *
+from src.utils import *
 import pandas as pd
 from typing import List, Tuple
 from sklearn.preprocessing import LabelBinarizer
