@@ -79,42 +79,64 @@ def process_image(
 
 
 
-def process_all_images(input_path: str, output_path: str, resized_image_shape: Tuple,transformations:List[TransformationsEnum]):
+def process_all_images(input_csv_file_path: str, output_path: str, resized_image_shape: Tuple,transformations:List[TransformationsEnum]):
     """
     Reads the folders, names categories with their names and returns CSV file with metadata
 
-    :param input_path: path to folders with pictures
+    :param csv_file_path: path to folders with pictures
     :param output_path: path where output will be returned
     :param resized_image_shape: shape of images to be returned
     :return:
     """
-
-    output_images_path = os.path.join(output_path, "images")
+    output_image_folder_path = os.path.join(output_path, "images")
+    prepare_folders(output_path, output_image_folder_path)
     csv_file_path = os.path.join(output_path, "metadata.csv")
 
-    prepare_folders(output_path, output_images_path)
-    prepare_csv(csv_file_path)
+    df = pd.read_csv(input_csv_file_path)
+    df = df.drop(['Unnamed: 0'], axis=1)
+    df.rename(inplace=True,
+              columns={'url_s':'url',
+                       'ass_s':'ass',
+                       'nipples_s':'nipples',
+                       'female_s':'female',
+                       'male_s':'male',
+                       'penis_s':'penis',
+                       'vagina_s':'vagina'})
+    debug = 5
+    df['image_name'] = ""
+    df['tags'] = ""
+    img_name_format = "img_{}.png"
+    n_rows = len(df)
 
-    df = pd.read_csv(csv_file_path)
-    current_id = 1 #has to check the current id in the folder or be set to 1 if none
-    categories_names = list(os.listdir(input_path))
 
-    encoder = LabelBinarizer()
-    encoder.fit(categories_names)
+    for index, row in df.iterrows():
 
-    #Todo so far it is useless :( delete one day
-    #save encoder to file so we can use it in algorithm
-    pickle_output = open(os.path.join(output_path,'classes_encoder.pkl'), 'wb')
-    pickle.dump(encoder, pickle_output)
+        tags = []
+        for key,value in row.to_dict().items():
+            if value == True:
+                tags.append(key)
 
-    for folder_name in os.listdir(input_path):
-        current_category_name = folder_name
-        category_path = os.path.join(input_path, folder_name)
-        images_in_category = list(Path(category_path).glob("*.jpg"))
-        df, current_id = process_image(
-            df, current_id, encoder, current_category_name, images_in_category,output_images_path, resized_image_shape,transformations
-        )
+        str_id = str(index).zfill(16)
+        new_image_name = img_name_format.format(str_id)
+        new_image_path = os.path.join(output_image_folder_path, new_image_name)
 
-        df.to_csv(csv_file_path, index=False, quotechar='"', encoding='ascii')
 
-    print("done, processed", len(df), "images")
+
+        image_path = row['url']
+        try:
+            img = Image.open(image_path).convert('RGB').resize(resized_image_shape)
+            img.save(new_image_path)
+        except:
+            print(f"Error with image {image_path}, skipping")
+            continue
+
+        df.at[index, 'image_name'] = new_image_name
+        df.at[index, 'tags'] = tags
+        print(np.round(((index+1)/n_rows)*100,decimals=3),'%', new_image_name)
+        debug =5
+
+    df = df.loc[(df['image_name'] != '') & (df['tags'] != '')]
+
+    df.to_csv(csv_file_path, index=False, quotechar='"', encoding='ascii')
+
+

@@ -1,10 +1,10 @@
-from src.image_preprocessor import process_all_images
+from src.preprocessing_with_df.image_preprocessor_mturk import process_all_images
 import argparse
 from src.transformations import TransformationsEnum
 
 def init(args):
     output_path = args.output_path
-    input_path = args.input_path
+    csv_file_path = args.csv_file_path
     resized_image_shape = (args.resize_image_width, args.resize_image_height)
 
     transformations = []
@@ -17,7 +17,7 @@ def init(args):
     if args.total_variance_denoising == True:
         transformations.append(TransformationsEnum('tv_den'))
 
-    process_all_images(input_path= input_path, output_path=output_path, resized_image_shape=resized_image_shape,transformations = transformations)
+    process_all_images(input_csv_file_path= csv_file_path, output_path=output_path, resized_image_shape=resized_image_shape,transformations = transformations)
 
 
 def main():
@@ -31,9 +31,9 @@ def main():
     )
 
     parser.add_argument(
-        "--input_path",
+        "--csv_file_path",
         type=str,
-        help="Path to root folder with the folders of categories. Categories in CSV will be named after folders names"
+        help="Path to CSV with data about images"
     )
 
     parser.add_argument(
