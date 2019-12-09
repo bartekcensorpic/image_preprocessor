@@ -138,5 +138,6 @@ def process_all_images(input_csv_file_path: str, output_path: str, resized_image
     df = df.loc[(df['image_name'] != '') & (df['tags'] != '')]
 
     df.to_csv(csv_file_path, index=False, quotechar='"', encoding='ascii')
+    print('done!')
 
 
