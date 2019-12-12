@@ -88,6 +88,9 @@ def process_all_images(input_csv_file_path: str, output_path: str, resized_image
     :param resized_image_shape: shape of images to be returned
     :return:
     """
+
+    #TODO use transformation list
+
     output_image_folder_path = os.path.join(output_path, "images")
     prepare_folders(output_path, output_image_folder_path)
     csv_file_path = os.path.join(output_path, "metadata.csv")
@@ -136,6 +139,31 @@ def process_all_images(input_csv_file_path: str, output_path: str, resized_image
         debug =5
 
     df = df.loc[(df['image_name'] != '') & (df['tags'] != '')]
+
+    ##################### remove classes with less than 5 instances
+    print('removing classes with less than 5 instances')
+    unique_vals = list(df.drop_duplicates('tags')['tags'])#.apply(lambda x: x[1:-1].replace('\'','').split(',')))
+
+    print('length:',len(df))
+    dataset_clean = False
+    while (not dataset_clean):
+        dataset_clean = True
+        for index,val in enumerate(unique_vals):
+            frame = df[df['tags'] == val]
+            n_img = len(frame)
+            print(index, n_img , '\t\t', val)
+            if n_img < 5:
+                dataset_clean = False
+                url = (frame['url']).values[0]
+                print(url)
+                print('_____________________')
+                df = df.loc[(df['url'] != url)]
+                print('length:',len(df))
+
+    print('length:',len(df))
+
+
+
 
     df.to_csv(csv_file_path, index=False, quotechar='"', encoding='ascii')
     print('done!')
