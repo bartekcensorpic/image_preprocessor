@@ -111,7 +111,6 @@ def process_all_images(input_csv_file_path: str, output_path: str, resized_image
     img_name_format = "img_{}.png"
     n_rows = len(df)
 
-
     for index, row in df.iterrows():
 
         tags = []
@@ -140,7 +139,10 @@ def process_all_images(input_csv_file_path: str, output_path: str, resized_image
 
     df = df.loc[(df['image_name'] != '') & (df['tags'] != '')]
 
-    ##################### remove classes with less than 5 instances
+    df.to_csv(csv_file_path, index=False, quotechar='"', encoding='ascii')
+    #################### remove classes with less than 5 instances
+    df = pd.read_csv(csv_file_path)
+
     print('removing classes with less than 5 instances')
     unique_vals = list(df.drop_duplicates('tags')['tags'])#.apply(lambda x: x[1:-1].replace('\'','').split(',')))
 
@@ -150,15 +152,17 @@ def process_all_images(input_csv_file_path: str, output_path: str, resized_image
         dataset_clean = True
         for index,val in enumerate(unique_vals):
             frame = df[df['tags'] == val]
+
             n_img = len(frame)
             print(index, n_img , '\t\t', val)
             if n_img < 5:
                 dataset_clean = False
-                url = (frame['url']).values[0]
-                print(url)
-                print('_____________________')
-                df = df.loc[(df['url'] != url)]
+                print('=====')
+                print(frame)
+                df = df[~df['url'].isin(frame['url'])]
                 print('length:',len(df))
+                print('########')
+                print('_____________________')
 
     print('length:',len(df))
 
