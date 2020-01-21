@@ -1,4 +1,4 @@
-from src.preprocessing_with_df.image_preprocessor_mturk import process_all_images
+from src.preprocessing_with_df.image_preprocessor_BPO import process_all_images
 import argparse
 from src.transformations import TransformationsEnum
 

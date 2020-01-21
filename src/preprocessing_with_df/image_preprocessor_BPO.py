@@ -96,27 +96,13 @@ def process_all_images(input_csv_file_path: str, output_path: str, resized_image
     csv_file_path = os.path.join(output_path, "metadata.csv")
 
     df = pd.read_csv(input_csv_file_path)
-    df = df.drop(['Unnamed: 0'], axis=1)
-    df.rename(inplace=True,
-              columns={'url_s':'url',
-                       'ass_s':'ass',
-                       'nipples_s':'nipples',
-                       'female_s':'female',
-                       'male_s':'male',
-                       'penis_s':'penis',
-                       'vagina_s':'vagina'})
-    debug = 5
+
+
     df['image_name'] = ""
-    df['tags'] = ""
     img_name_format = "img_{}.png"
     n_rows = len(df)
 
     for index, row in df.iterrows():
-
-        tags = []
-        for key,value in row.to_dict().items():
-            if value == True:
-                tags.append(key)
 
         str_id = str(index).zfill(16)
         new_image_name = img_name_format.format(str_id)
@@ -133,43 +119,43 @@ def process_all_images(input_csv_file_path: str, output_path: str, resized_image
             continue
 
         df.at[index, 'image_name'] = new_image_name
-        df.at[index, 'tags'] = tags
         print(np.round(((index+1)/n_rows)*100,decimals=3),'%', new_image_name)
         debug =5
 
     df = df.loc[(df['image_name'] != '') & (df['tags'] != '')]
 
     df.to_csv(csv_file_path, index=False, quotechar='"', encoding='ascii')
-    #################### remove classes with less than 5 instances
-    df = pd.read_csv(csv_file_path)
-
-    print('removing classes with less than 5 instances')
-    unique_vals = list(df.drop_duplicates('tags')['tags'])#.apply(lambda x: x[1:-1].replace('\'','').split(',')))
-
-    print('length:',len(df))
-    dataset_clean = False
-    while (not dataset_clean):
-        dataset_clean = True
-        for index,val in enumerate(unique_vals):
-            frame = df[df['tags'] == val]
-
-            n_img = len(frame)
-            print(index, n_img , '\t\t', val)
-            if n_img < 5:
-                dataset_clean = False
-                print('=====')
-                print(frame)
-                df = df[~df['url'].isin(frame['url'])]
-                print('length:',len(df))
-                print('########')
-                print('_____________________')
-
-    print('length:',len(df))
-
-
-
-
-    df.to_csv(csv_file_path, index=False, quotechar='"', encoding='ascii')
-    print('done!')
+    print('done (without removing duplicates)')
+    # #################### remove classes with less than 5 instances
+    # df = pd.read_csv(csv_file_path)
+    #
+    # print('removing classes with less than 5 instances')
+    # unique_vals = list(df.drop_duplicates('tags')['tags'])#.apply(lambda x: x[1:-1].replace('\'','').split(',')))
+    #
+    # print('length:',len(df))
+    # dataset_clean = False
+    # while (not dataset_clean):
+    #     dataset_clean = True
+    #     for index,val in enumerate(unique_vals):
+    #         frame = df[df['tags'] == val]
+    #
+    #         n_img = len(frame)
+    #         print(index, n_img , '\t\t', val)
+    #         if n_img < 5:
+    #             dataset_clean = False
+    #             print('=====')
+    #             print(frame)
+    #             df = df[~df['url'].isin(frame['url'])]
+    #             print('length:',len(df))
+    #             print('########')
+    #             print('_____________________')
+    #
+    # print('length:',len(df))
+    #
+    #
+    #
+    #
+    # df.to_csv(csv_file_path, index=False, quotechar='"', encoding='ascii')
+    # print('removing duplicates done!')
 
 
