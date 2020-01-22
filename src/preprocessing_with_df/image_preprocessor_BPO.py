@@ -9,6 +9,7 @@ import matplotlib.pyplot as plt
 import pickle
 import numpy as np
 from src.transformations import *
+import traceback
 
 
 def process_image(
@@ -95,14 +96,15 @@ def process_all_images(input_csv_file_path: str, output_path: str, resized_image
     prepare_folders(output_path, output_image_folder_path)
     csv_file_path = os.path.join(output_path, "metadata.csv")
 
-    df = pd.read_csv(input_csv_file_path)
+    input_df = pd.read_csv(input_csv_file_path)
+    new_df = pd.DataFrame(columns=list(input_df.columns))
 
 
-    df['image_name'] = ""
+    new_df['image_name'] = ""
     img_name_format = "img_{}.png"
-    n_rows = len(df)
+    n_rows = len(input_df)
 
-    for index, row in df.iterrows():
+    for index, row in input_df.iterrows():
 
         str_id = str(index).zfill(16)
         new_image_name = img_name_format.format(str_id)
@@ -114,18 +116,26 @@ def process_all_images(input_csv_file_path: str, output_path: str, resized_image
         try:
             img = Image.open(image_path).convert('RGB').resize(resized_image_shape)
             img.save(new_image_path)
+            row['image_name'] = new_image_name
+            new_df = new_df.append(row, ignore_index=True)
         except:
+            print(traceback.print_exc())
             print(f"Error with image {image_path}, skipping")
             continue
 
-        df.at[index, 'image_name'] = new_image_name
-        print(np.round(((index+1)/n_rows)*100,decimals=3),'%', new_image_name)
-        debug =5
+        if index % 20 ==0:
+            print(np.round(((index+1)/n_rows)*100,decimals=3),'%', new_image_name)
+            print('new_df length:', len(new_df))
 
-    df = df.loc[(df['image_name'] != '') & (df['tags'] != '')]
 
-    df.to_csv(csv_file_path, index=False, quotechar='"', encoding='ascii')
+
+    new_df = new_df.loc[(new_df['image_name'] != '') & (new_df['tags'] != '')]
+
+    new_df.to_csv(csv_file_path, index=False, quotechar='"', encoding='ascii')
     print('done (without removing duplicates)')
+
+
+
     # #################### remove classes with less than 5 instances
     # df = pd.read_csv(csv_file_path)
     #
