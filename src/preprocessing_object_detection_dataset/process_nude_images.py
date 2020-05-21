@@ -105,6 +105,7 @@ def process_nude_images(columns, annots_folder_path, nude_img_folder_path):
     group_aug_dict = group_by_augmentations(nude_df)
 
     train_df, validation_df, test_df = split_and_shufle(group_aug_dict, columns)
+    #TODO
     ashbdsjkfdj
 
 
