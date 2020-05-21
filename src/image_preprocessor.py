@@ -102,10 +102,6 @@ def process_all_images(input_path: str, output_path: str, resized_image_shape: T
     encoder = LabelBinarizer()
     encoder.fit(categories_names)
 
-    #Todo so far it is useless :( delete one day
-    #save encoder to file so we can use it in algorithm
-    pickle_output = open(os.path.join(output_path,'classes_encoder.pkl'), 'wb')
-    pickle.dump(encoder, pickle_output)
 
     for folder_name in os.listdir(input_path):
         current_category_name = folder_name
