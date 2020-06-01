@@ -18,7 +18,7 @@ def init(args):
 
     it also assumes that images are augmented and their names follow this pattern: (?P<file_path>.*)(_aug_){1}\d+_\d+(\.jpg|\.png)
 
-    it creates CSV file with absolute path to each file, tags, nipples,    Vaginas,    penis,    nakedWoman,    nakedMan, nonNude
+    it creates 3 CSV files with absolute path to each file, tags, nipples,    Vaginas,    penis,    nakedWoman,    nakedMan, nonNude
 
     So if differs from CSV produced by other methods from this project
     :param args:
@@ -32,7 +32,7 @@ def init(args):
 
     create_csv(output_path, annots_folder_path, nude_img_folder_path, non_nude_img_folder_path)
 
-
+    print('###########Script done')
 
 
 def main():

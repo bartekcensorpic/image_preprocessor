@@ -1,11 +1,18 @@
-from __future__ import annotations
-from typing import (Callable, Iterable, TypeVar, Any, List)
+
+from typing import Callable, Iterable, TypeVar, Any, Optional
 from pathlib import Path
 from tqdm import tqdm
 
-R = TypeVar('R')
+R = TypeVar("R")
 
-def process_files_generator(function_to_use: Callable[[Any, Any], R], folder_path:str, pattern: Iterable, params, tqdm_description:str = None)-> R:
+
+def process_files_generator(
+    function_to_use: Callable[[Any, Any], R],
+    folder_path: str,
+    pattern: Iterable,
+    params,
+    tqdm_description: Optional[str] = None,
+) -> R:
     """
     Recursively walks through FOLDER_PATH, collects all files that match extension and perform FUNCTION_TO_USE on each file. Yields an object of whatever FUNCTION_TO_USE returns
     :param tqdm_description: Description to be displayed witch each iteration

@@ -51,6 +51,7 @@ def group_by_augmentations(df):
 
     return image_to_augmentation_dict
 
+
 def find_annotations_nude_image(xml_file_path, nude_img_folder_path, classes):
     '''
 
@@ -70,6 +71,36 @@ def find_annotations_nude_image(xml_file_path, nude_img_folder_path, classes):
 
 
 #columns = ['image_path','tags','boobsPecs','nipples','Vaginas','penis','nakedWoman','nakedMan', 'nonNude' ]
+def find_sfw_images(sfw_image_path):
+
+    return sfw_image_path, ['nonNude']
+
+
+
+def extract_all_sfw_images(columns, non_nude_img_folder_path):
+    classes = columns[2:]
+
+    sfw_images_tags_gen = process_files_generator(find_sfw_images,
+                                                  non_nude_img_folder_path,
+                                                  ['*.jpg', '*.png'],
+                                                  {},
+                                                  tqdm_description='extracting sfw images'
+                                                  )
+
+    df =  pd.DataFrame(columns=columns)
+
+    for idx,(image_path, tags) in enumerate(sfw_images_tags_gen):
+
+        row = {'image_path': image_path, 'tags':tags}
+
+        for class_name in classes:
+            if class_name in tags:
+                row[class_name] = True
+            else:
+                row[class_name] = False
+        df.loc[idx] =row
+
+    return df
 
 def extract_all_nude_images(columns, annots_folder_path, nude_img_folder_path)-> pd.DataFrame:
     classes =columns[2:]
@@ -94,8 +125,6 @@ def extract_all_nude_images(columns, annots_folder_path, nude_img_folder_path)->
                 row[class_name] = False
         df.loc[idx] =row
 
-
-
     return df
 
 def process_nude_images(columns, annots_folder_path, nude_img_folder_path):
@@ -105,8 +134,22 @@ def process_nude_images(columns, annots_folder_path, nude_img_folder_path):
     group_aug_dict = group_by_augmentations(nude_df)
 
     train_df, validation_df, test_df = split_and_shufle(group_aug_dict, columns)
-    #TODO
-    ashbdsjkfdj
+
+    return train_df, validation_df, test_df
+
+
+
+
+
+def process_sfw_images(columns, non_nude_img_folder_path):
+
+    sfw_df = extract_all_sfw_images(columns, non_nude_img_folder_path)
+
+    group_aug_dict = group_by_augmentations(sfw_df)
+
+    train_df, validation_df, test_df = split_and_shufle(group_aug_dict, columns)
+
+    return train_df, validation_df, test_df
 
 
 

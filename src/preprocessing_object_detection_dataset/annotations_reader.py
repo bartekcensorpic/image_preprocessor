@@ -1,6 +1,5 @@
 import xml.etree.ElementTree as ET
 
-#columns = ['image_path','boobsPecs','nipples','Vaginas','penis','nakedWoman','nakedMan', 'non_nude' ]
 
 def convert_annotation(xml_file_path, classes):
 
@@ -21,7 +20,7 @@ def convert_annotation(xml_file_path, classes):
         tags.add(cls)
 
     if len(tags) == 0:
-        tags.add('non_nude')
+        tags.add('nonNude')
 
     return image_name, tags
 
