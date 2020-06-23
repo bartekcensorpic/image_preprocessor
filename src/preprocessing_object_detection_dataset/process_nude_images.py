@@ -15,6 +15,20 @@ def group_aug_to_df(data, columns):
 
     return df
 
+def split_and_shufle_no_aug(df):
+
+    df_shuffled = df.sample(frac=1).reset_index(drop=True)
+
+    n_lines = len(df)
+    n_train = int(n_lines * 0.6)
+    rest = int(n_lines - n_train)
+    n_test = int(rest / 2)
+
+    train_df = df_shuffled.iloc[:n_train]
+    test_df = df_shuffled.iloc[n_train:n_train+n_test]
+    valid_df = df_shuffled.iloc[n_train+n_test:]
+
+    return train_df, valid_df, test_df
 
 def split_and_shufle(group_aug_dict, columns):
     data = [ (random.random(), group) for group in group_aug_dict.items() ]
@@ -23,8 +37,6 @@ def split_and_shufle(group_aug_dict, columns):
     n_train = int(n_lines * 0.6)
     rest =  int(n_lines - n_train)
     n_test = int(rest /2)
-
-
 
     train_df = group_aug_to_df( data[:n_train],columns)
     test_df = group_aug_to_df( data[n_train:n_train+n_test],columns)
@@ -89,7 +101,11 @@ def extract_all_sfw_images(columns, non_nude_img_folder_path):
 
     df =  pd.DataFrame(columns=columns)
 
-    for idx,(image_path, tags) in enumerate(sfw_images_tags_gen):
+    for idx,value in enumerate(sfw_images_tags_gen):
+        if value is None:
+            continue
+
+        (image_path, tags) = value
 
         row = {'image_path': image_path, 'tags':tags}
 
@@ -114,8 +130,11 @@ def extract_all_nude_images(columns, annots_folder_path, nude_img_folder_path)->
 
     df =  pd.DataFrame(columns=columns)
 
-    for idx,(image_path, tags) in enumerate(annots_gen):
+    for idx,value in enumerate(annots_gen):
+        if value is None:
+            continue
 
+        (image_path, tags) = value
         row = {'image_path': image_path, 'tags':tags}
 
         for class_name in classes:
@@ -127,13 +146,15 @@ def extract_all_nude_images(columns, annots_folder_path, nude_img_folder_path)->
 
     return df
 
-def process_nude_images(columns, annots_folder_path, nude_img_folder_path):
+def process_nude_images(columns, annots_folder_path, nude_img_folder_path,are_images_augmented):
 
     nude_df = extract_all_nude_images(columns, annots_folder_path, nude_img_folder_path)
+    if are_images_augmented:
+        group_aug_dict = group_by_augmentations(nude_df)
 
-    group_aug_dict = group_by_augmentations(nude_df)
-
-    train_df, validation_df, test_df = split_and_shufle(group_aug_dict, columns)
+        train_df, validation_df, test_df = split_and_shufle(group_aug_dict, columns)
+    else:
+        train_df, validation_df, test_df = split_and_shufle_no_aug(nude_df)
 
     return train_df, validation_df, test_df
 
@@ -141,14 +162,16 @@ def process_nude_images(columns, annots_folder_path, nude_img_folder_path):
 
 
 
-def process_sfw_images(columns, non_nude_img_folder_path):
+def process_sfw_images(columns, non_nude_img_folder_path,are_images_augmented):
 
     sfw_df = extract_all_sfw_images(columns, non_nude_img_folder_path)
 
-    group_aug_dict = group_by_augmentations(sfw_df)
+    if are_images_augmented:
+        group_aug_dict = group_by_augmentations(sfw_df)
 
-    train_df, validation_df, test_df = split_and_shufle(group_aug_dict, columns)
-
+        train_df, validation_df, test_df = split_and_shufle(group_aug_dict, columns)
+    else:
+        train_df, validation_df, test_df = split_and_shufle_no_aug(sfw_df)
     return train_df, validation_df, test_df
 
 
